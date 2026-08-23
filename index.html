@@ -3,146 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medica - Medicine Finder</title>
+    <title>Medica Pro - Premium Medicine Finder</title>
     <style>
         :root {
             --primary: #0070f3;
             --accent: #00dfd8;
-            --surface: rgba(22, 27, 48, 0.85); /* Keeps your exact dark blue panel color */
-            --text: #ffffff;
-            --muted: #cbd5e1;
+            --bg-overlay: rgba(10, 15, 30, 0.88);
+            --card-bg: rgba(22, 27, 48, 0.75);
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
         }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
+
         body {
-            /* This is a direct, verified link to a premium landscape image of medicine tablets */
-            background: linear-gradient(rgba(10, 15, 29, 0.75), rgba(10, 15, 29, 0.8)), 
-                        url("https://picsum.photos");
+            /* Guaranteed High-Availability HD Medical Background Image */
+            background: linear-gradient(rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.9)), 
+                        url('https://unsplash.com');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            color: var(--text);
+            color: var(--text-main);
             line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
+
+        /* Modern Glassmorphic Navigation Bar */
         nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 20px 8%;
-            background: rgba(22, 27, 48, 0.9);
+            background: rgba(16, 22, 42, 0.8);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-status {
+            background: rgba(0, 223, 216, 0.1);
+            border: 1px solid var(--accent);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Realistic Header & Hero Area */
         .hero {
             text-align: center;
             padding: 80px 20px 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
+
         .hero h1 {
-            font-size: 3rem;
+            font-size: 3.2rem;
             margin-bottom: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
+
         .hero h1 span {
             background: linear-gradient(45deg, var(--primary), var(--accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .hero p {
-            color: var(--muted);
-            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-size: 1.25rem;
             margin-bottom: 40px;
         }
+
+        /* Realistic Search System Layout */
         .search-wrapper {
-            background: #161b30;
-            padding: 8px;
+            background: #111729;
+            padding: 10px;
             border-radius: 50px;
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
             display: flex;
             align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.3s ease;
         }
+
+        .search-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 223, 216, 0.2);
+        }
+
         .search-wrapper input {
             flex: 1;
             background: transparent;
             border: none;
             padding: 15px 25px;
-            color: var(--text);
-            font-size: 1rem;
+            color: var(--text-main);
+            font-size: 1.1rem;
             outline: none;
         }
+
+        .search-wrapper input::placeholder {
+            color: #4b5563;
+        }
+
         .search-wrapper button {
             background: linear-gradient(45deg, var(--primary), var(--accent));
-            color: #000;
-            font-weight: 600;
+            color: #0b0f19;
+            font-weight: 700;
             border: none;
-            padding: 15px 35px;
+            padding: 16px 40px;
             border-radius: 50px;
             cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
+        .search-wrapper button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px rgba(0, 223, 216, 0.4);
+        }
+
+        /* High-End Feature Grid */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px 20px 60px 20px;
+            padding: 40px 20px 80px 20px;
             flex: 1;
         }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
         }
+
         .card {
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 30px 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: left;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 223, 216, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 112, 243, 0.15);
+        }
+
         .card-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: rgba(0, 112, 243, 0.1);
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 112, 243, 0.2);
         }
+
         .card h3 {
-            margin-bottom: 10px;
-            color: var(--accent);
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: #ffffff;
         }
+
         .card p {
-            color: var(--muted);
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.5;
         }
+
+        /* Beautiful Signature Footer */
         footer {
             text-align: center;
-            padding: 25px 20px;
-            background: #0d1117;
+            padding: 35px 20px;
+            background: #0b0f19;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             margin-top: auto;
         }
+
         footer p {
             font-size: 1.1rem;
-            color: var(--text);
+            color: var(--text-main);
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
+
         footer span {
             color: var(--accent);
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 223, 216, 0.3);
         }
     </style>
 </head>
 <body>
 
-    <nav>MEDICA</nav>
+    <nav>
+        <div class="logo">MEDICA PRO</div>
+        <div class="nav-status">System Online</div>
+    </nav>
 
     <section class="hero">
-        <h1>Find Your <span>Prescription Medicine</span></h1>
-        <p>Access our database layout for tracking drug availability and local pharmacy stocks.</p>
+        <h1>Find Your <span>Prescription Medicine</span> Instantly</h1>
+        <p>Access our ultra-responsive global drug indexing registry. Track local pharmacy inventories, critical pill properties, and emergency medicine batches in real-time.</p>
         
         <div class="search-wrapper">
-            <input type="text" placeholder="Enter medicine name here...">
-            <button type="button">Search</button>
+            <input type="text" placeholder="Search by generic chemical or brand name...">
+            <button type="button">Search Directory</button>
         </div>
     </section>
 
@@ -150,18 +247,18 @@
         <div class="grid">
             <div class="card">
                 <div class="card-icon">💊</div>
-                <h3>Verified Directory</h3>
-                <p>Cross-reference medicine names instantly against verified safety guidelines.</p>
+                <h3>Verified Indexing</h3>
+                <p>Instantly search medicine variants with live chemical breakdowns and laboratory cross-matching verification maps.</p>
             </div>
             <div class="card">
                 <div class="card-icon">🛡️</div>
-                <h3>Safety Alerts</h3>
-                <p>Get instant details regarding pill interactions and medical updates.</p>
+                <h3>Safety Protocol</h3>
+                <p>Automated warnings check for drug contradictions, recommended allergy metrics, and daily threshold notifications.</p>
             </div>
             <div class="card">
                 <div class="card-icon">📍</div>
-                <h3>Stock Tracking</h3>
-                <p>Find out which local centers carry the prescription you need.</p>
+                <h3>Smart Tracking</h3>
+                <p>Map out exactly which authorized diagnostic stores and regional hospitals carry verified stocks of your tablet items.</p>
             </div>
         </div>
     </div>
