@@ -1,272 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medica Pro - Premium Medicine Finder</title>
-    <style>
-        :root {
-            --primary: #0070f3;
-            --accent: #00dfd8;
-            --bg-overlay: rgba(10, 15, 30, 0.88);
-            --card-bg: rgba(22, 27, 48, 0.75);
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-        }
+// Sample Products Data
+const products = [
+    { id: 1, name: 'Wholesale Rice', price: 25.99, description: '25kg Bag', emoji: '🍚' },
+    { id: 2, name: 'Bulk Flour', price: 15.99, description: '10kg Bag', emoji: '🌾' },
+    { id: 3, name: 'Cooking Oil', price: 35.99, description: '5L Bottle', emoji: '🛢️' },
+    { id: 4, name: 'Sugar Pack', price: 12.99, description: '5kg Bag', emoji: '🍭' },
+    { id: 5, name: 'Tea Bulk', price: 8.99, description: '500g Pack', emoji: '☕' },
+    { id: 6, name: 'Coffee Beans', price: 18.99, description: '1kg Bag', emoji: '🫘' },
+    { id: 7, name: 'Spice Mix', price: 6.99, description: '250g Pack', emoji: '🌶️' },
+    { id: 8, name: 'Milk Powder', price: 22.99, description: '1kg Pack', emoji: '🥛' },
+    { id: 9, name: 'Pasta Box', price: 4.99, description: '2kg Box', emoji: '🍝' },
+    { id: 10, name: 'Canned Beans', price: 9.99, description: 'Case of 12', emoji: '🫘' },
+    { id: 11, name: 'Honey Jars', price: 14.99, description: '500g Jar', emoji: '🍯' },
+    { id: 12, name: 'Nuts Mix', price: 19.99, description: '1kg Pack', emoji: '🥜' }
+];
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+// Cart Array
+let cart = [];
 
-        body {
-            /* Guaranteed High-Availability HD Medical Background Image */
-            background: linear-gradient(rgba(10, 15, 30, 0.85), rgba(10, 15, 30, 0.9)), 
-                        url('https://unsplash.com');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            color: var(--text-main);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+// Initialize Page
+document.addEventListener('DOMContentLoaded', () => {
+    displayProducts();
+    loadCartFromStorage();
+});
 
-        /* Modern Glassmorphic Navigation Bar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 8%;
-            background: rgba(16, 22, 42, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+// Display Products
+function displayProducts() {
+    const productsList = document.getElementById('products-list');
+    productsList.innerHTML = '';
+    
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+            <div class="product-image">${product.emoji}</div>
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-description">${product.description}</div>
+                <div class="product-price">$${product.price.toFixed(2)}</div>
+                <div class="quantity-selector">
+                    <button onclick="decreaseQty(this)">−</button>
+                    <input type="number" class="qty-input" value="1" min="1" max="100">
+                    <button onclick="increaseQty(this)">+</button>
+                </div>
+                <button class="add-to-cart-btn" onclick="addToCart(${product.id}, this)">Add to Cart</button>
+            </div>
+        `;
+        productsList.appendChild(productCard);
+    });
+}
 
-        .logo {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+// Quantity Control
+function increaseQty(btn) {
+    const input = btn.previousElementSibling;
+    input.value = parseInt(input.value) + 1;
+}
 
-        .nav-status {
-            background: rgba(0, 223, 216, 0.1);
-            border: 1px solid var(--accent);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--accent);
-            font-weight: 600;
-        }
+function decreaseQty(btn) {
+    const input = btn.nextElementSibling;
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
 
-        /* Realistic Header & Hero Area */
-        .hero {
-            text-align: center;
-            padding: 80px 20px 40px 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
+// Add to Cart
+function addToCart(productId, btn) {
+    const product = products.find(p => p.id === productId);
+    const quantityInput = btn.previousElementSibling.querySelector('.qty-input');
+    const quantity = parseInt(quantityInput.value);
+    
+    // Check if product already in cart
+    const existingItem = cart.find(item => item.id === productId);
+    
+    if (existingItem) {
+        existingItem.quantity += quantity;
+    } else {
+        cart.push({
+            id: productId,
+            name: product.name,
+            price: product.price,
+            quantity: quantity
+        });
+    }
+    
+    updateCart();
+    showNotification(`${product.name} added to cart!`);
+    quantityInput.value = 1;
+}
 
-        .hero h1 {
-            font-size: 3.2rem;
-            margin-bottom: 20px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
+// Update Cart
+function updateCart() {
+    updateCartCount();
+    displayCart();
+    saveCartToStorage();
+}
 
-        .hero h1 span {
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+// Update Cart Count
+function updateCartCount() {
+    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    document.getElementById('cart-count').textContent = count;
+}
 
-        .hero p {
-            color: var(--text-muted);
-            font-size: 1.25rem;
-            margin-bottom: 40px;
-        }
-
-        /* Realistic Search System Layout */
-        .search-wrapper {
-            background: #111729;
-            padding: 10px;
-            border-radius: 50px;
-            max-width: 650px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            transition: border-color 0.3s ease;
-        }
-
-        .search-wrapper:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(0, 223, 216, 0.2);
-        }
-
-        .search-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 15px 25px;
-            color: var(--text-main);
-            font-size: 1.1rem;
-            outline: none;
-        }
-
-        .search-wrapper input::placeholder {
-            color: #4b5563;
-        }
-
-        .search-wrapper button {
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            color: #0b0f19;
-            font-weight: 700;
-            border: none;
-            padding: 16px 40px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .search-wrapper button:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 15px rgba(0, 223, 216, 0.4);
-        }
-
-        /* High-End Feature Grid */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px 80px 20px;
-            flex: 1;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px 30px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            text-align: left;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(0, 223, 216, 0.3);
-            box-shadow: 0 15px 30px rgba(0, 112, 243, 0.15);
-        }
-
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-            background: rgba(0, 112, 243, 0.1);
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 112, 243, 0.2);
-        }
-
-        .card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 12px;
-            font-weight: 700;
-            color: #ffffff;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
-        /* Beautiful Signature Footer */
-        footer {
-            text-align: center;
-            padding: 35px 20px;
-            background: #0b0f19;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            margin-top: auto;
-        }
-
-        footer p {
-            font-size: 1.1rem;
-            color: var(--text-main);
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        footer span {
-            color: var(--accent);
-            font-weight: 700;
-            text-shadow: 0 0 10px rgba(0, 223, 216, 0.3);
-        }
-    </style>
-</head>
-<body>
-
-    <nav>
-        <div class="logo">MEDICA PRO</div>
-        <div class="nav-status">System Online</div>
-    </nav>
-
-    <section class="hero">
-        <h1>Find Your <span>Prescription Medicine</span> Instantly</h1>
-        <p>Access our ultra-responsive global drug indexing registry. Track local pharmacy inventories, critical pill properties, and emergency medicine batches in real-time.</p>
+// Display Cart
+function displayCart() {
+    const cartItems = document.getElementById('cart-items');
+    const totalPrice = document.getElementById('total-price');
+    
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<p>Your cart is empty</p>';
+        totalPrice.textContent = '0.00';
+        return;
+    }
+    
+    cartItems.innerHTML = '';
+    let total = 0;
+    
+    cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
         
-        <div class="search-wrapper">
-            <input type="text" placeholder="Search by generic chemical or brand name...">
-            <button type="button">Search Directory</button>
-        </div>
-    </section>
-
-    <div class="container">
-        <div class="grid">
-            <div class="card">
-                <div class="card-icon">💊</div>
-                <h3>Verified Indexing</h3>
-                <p>Instantly search medicine variants with live chemical breakdowns and laboratory cross-matching verification maps.</p>
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">$${item.price.toFixed(2)} x ${item.quantity} = $${itemTotal.toFixed(2)}</div>
             </div>
-            <div class="card">
-                <div class="card-icon">🛡️</div>
-                <h3>Safety Protocol</h3>
-                <p>Automated warnings check for drug contradictions, recommended allergy metrics, and daily threshold notifications.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">📍</div>
-                <h3>Smart Tracking</h3>
-                <p>Map out exactly which authorized diagnostic stores and regional hospitals carry verified stocks of your tablet items.</p>
-            </div>
-        </div>
-    </div>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+        `;
+        cartItems.appendChild(cartItem);
+    });
+    
+    totalPrice.textContent = total.toFixed(2);
+}
 
-    <footer>
-        <p>Made by <span>Muhammad Wamiq</span></p>
-    </footer>
+// Remove from Cart
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    updateCart();
+    showNotification('Item removed from cart');
+}
 
-</body>
-</html>
+// Toggle Cart Modal
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    if (modal.style.display === 'block') {
+        modal.style.display = 'none';
+    } else {
+        modal.style.display = 'block';
+        displayCart();
+    }
+}
 
+// Checkout
+function checkout() {
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    alert(`Order confirmed!\n\nTotal: $${total.toFixed(2)}\n\nThank you for your purchase!\n\nYour order will be processed shortly.`);
+    cart = [];
+    updateCart();
+    toggleCart();
+    localStorage.removeItem('cart');
+}
+
+// Handle Contact Form
+function handleContactForm(event) {
+    event.preventDefault();
+    alert('Thank you for contacting us! We will get back to you soon.');
+    event.target.reset();
+}
+
+// Show Notification
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background: #667eea;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 999;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Local Storage Functions
+function saveCartToStorage() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function loadCartFromStorage() {
+    const stored = localStorage.getItem('cart');
+    if (stored) {
+        cart = JSON.parse(stored);
+        updateCartCount();
+    }
+}
+
+// Add CSS Animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+`;
+document.head.appendChild(style);
